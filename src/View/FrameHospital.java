@@ -1,0 +1,463 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package View;
+
+import java.awt.HeadlessException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import Controller.Conexion;
+
+/**
+ *
+ * @author Nicolas D'aleman
+ */
+public class FrameHospital extends javax.swing.JFrame {
+
+    Conexion con = new Conexion();
+    Connection cn;
+    Statement st;
+    ResultSet rs;
+    DefaultTableModel modelo;
+
+    /**
+     * Creates new form FrameHospital
+     */
+    public FrameHospital() {
+        initComponents();
+        setLocationRelativeTo(null);
+        show_hospitals();
+
+    }
+
+    void show_hospitals() {
+        String sql = "SELECT * FROM tb_hospital";
+        try {
+            cn = con.getConnection();
+            st = cn.createStatement();
+            rs = st.executeQuery(sql);
+            //Los datos que devuelve la consulta se muestran en la tabla
+            Object[] hospital = new Object[3];
+            modelo = (DefaultTableModel) tbl_hospital.getModel();
+            while (rs.next()) {
+                hospital[0] = rs.getInt("id");
+                hospital[1] = rs.getString("name");
+                hospital[2] = rs.getString("address");
+                modelo.addRow(hospital);
+                System.out.println(rs.getInt("id"));
+            }
+            tbl_hospital.setModel(modelo);
+        } catch (SQLException e) {
+
+        }
+    }
+
+    void add_hospital() {
+        String name = txt_nombreHospital.getText();
+        String address = txt_direccionHospital.getText();
+
+        if (name.isEmpty() || address.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Falta ingresar el nombre del departamento");
+        } else {
+            String query = "INSERT INTO `tb_hospital`(name, `address`) VALUES('" + name + "', '" + address + "')";
+
+            try {
+                cn = con.getConnection();
+                st = cn.createStatement();
+                st.executeUpdate(query);
+                JOptionPane.showMessageDialog(this, "El hospital ha sido creado");
+                clear_rows_table();
+                show_hospitals();
+            } catch (HeadlessException | SQLException e) {
+                JOptionPane.showMessageDialog(this, "No se pudo crear el hospital");
+            }
+        }
+    }
+
+    void edit_hospital() {
+        //Hacemos nuevamente lectura de los valores contenidos en los JTextField
+        //Para identificar si el usuario modifico algún valor
+        int id = Integer.parseInt(txt_idHospital.getText());
+        String name = txt_nombreHospital.getText();
+        String address = txt_direccionHospital.getText();
+        if (name.isEmpty() || address.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Falta ingresar el nombre del hospital o la dirección");
+        } else {
+            String query = "UPDATE tb_hospital SET name = '" + name + "', address= '" + address + "' WHERE id = " + id;
+            //UPDATE tb_persons SET dni =dni, nombre= 'name' WHERE id = id
+            try {
+                cn = con.getConnection();
+                st = cn.createStatement();
+                st.executeUpdate(query);
+                JOptionPane.showMessageDialog(this, "El hospital ha sido modificado con éxito");
+                clear_rows_table();
+                show_hospitals();
+            } catch (HeadlessException | SQLException e) {
+                JOptionPane.showMessageDialog(this, "No se pudo modificar el hospital");
+            }
+        }
+    }
+
+    void delete_hospital() {
+        int fila = tbl_hospital.getSelectedRow();
+        int id = Integer.parseInt(txt_idHospital.getText());
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "No has seleccionado un hospital");
+        } else {
+
+            System.out.println("ID: " + id);
+            String query = "DELETE FROM tb_hospital WHERE id = " + id;
+            try {
+                cn = con.getConnection();
+                st = cn.createStatement();
+                st.executeUpdate(query);
+                JOptionPane.showMessageDialog(this, "El hospital ha sido eliminado con exito");
+                clear_rows_table();
+                show_hospitals();
+            } catch (HeadlessException | SQLException e) {
+            }
+        }
+    }
+
+    void clear_rows_table() {
+        for (int i = 0; i < tbl_hospital.getRowCount(); i++) {
+            modelo.removeRow(i);
+            i = i - 1;
+        }
+        txt_idHospital.setText("");
+        txt_nombreHospital.setText("");
+        txt_direccionHospital.setText("");
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        txt_nombreHospital = new javax.swing.JTextField();
+        txt_direccionHospital = new javax.swing.JTextField();
+        btn_añadirHospital = new javax.swing.JToggleButton();
+        btn_editarHospital = new javax.swing.JToggleButton();
+        btn_eliminarHospital = new javax.swing.JToggleButton();
+        jLabel4 = new javax.swing.JLabel();
+        txt_idHospital = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbl_hospital = new javax.swing.JTable();
+        btn_añadirCliente = new javax.swing.JToggleButton();
+        jToggleButton1 = new javax.swing.JToggleButton();
+        jToggleButton2 = new javax.swing.JToggleButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(204, 204, 204));
+
+        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+
+        jLabel1.setText("FORMULARIO HOSPITALES");
+
+        jLabel2.setText("Nombre:");
+
+        jLabel3.setText("Dirección:");
+
+        btn_añadirHospital.setText("Agregar Hospital");
+        btn_añadirHospital.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_añadirHospitalActionPerformed(evt);
+            }
+        });
+
+        btn_editarHospital.setText("Editar Hospital");
+        btn_editarHospital.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_editarHospitalActionPerformed(evt);
+            }
+        });
+
+        btn_eliminarHospital.setText("Eliminar Hospital");
+        btn_eliminarHospital.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_eliminarHospitalActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("Id:");
+
+        txt_idHospital.setEditable(false);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(331, 331, 331)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(178, 178, 178)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel4)
+                                .addComponent(jLabel2)))
+                        .addGap(51, 51, 51)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txt_nombreHospital)
+                            .addComponent(txt_direccionHospital)
+                            .addComponent(txt_idHospital, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(124, 124, 124)
+                        .addComponent(btn_añadirHospital)
+                        .addGap(87, 87, 87)
+                        .addComponent(btn_editarHospital)
+                        .addGap(100, 100, 100)
+                        .addComponent(btn_eliminarHospital)))
+                .addContainerGap(146, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txt_idHospital, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txt_nombreHospital, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txt_direccionHospital, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(40, 40, 40)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_añadirHospital)
+                    .addComponent(btn_editarHospital)
+                    .addComponent(btn_eliminarHospital))
+                .addGap(32, 32, 32))
+        );
+
+        tbl_hospital.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Hospital", "Dirección"
+            }
+        ));
+        tbl_hospital.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbl_hospitalMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tbl_hospital);
+
+        btn_añadirCliente.setText("Añadir Cliente");
+        btn_añadirCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_añadirClienteActionPerformed(evt);
+            }
+        });
+
+        jToggleButton1.setText("Añadir Mascota");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton2.setText("Añadir Doctor");
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 780, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jToggleButton2)
+                .addGap(18, 18, 18)
+                .addComponent(btn_añadirCliente)
+                .addGap(18, 18, 18)
+                .addComponent(jToggleButton1)
+                .addGap(29, 29, 29))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_añadirCliente)
+                    .addComponent(jToggleButton1)
+                    .addComponent(jToggleButton2))
+                .addGap(177, 177, 177))
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btn_eliminarHospitalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_eliminarHospitalActionPerformed
+        // TODO add your handling code here:
+        delete_hospital();
+        clear_rows_table();
+        show_hospitals();
+    }//GEN-LAST:event_btn_eliminarHospitalActionPerformed
+
+    private void tbl_hospitalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_hospitalMouseClicked
+        // TODO add your handling code here:
+        int row = tbl_hospital.getSelectedRow();
+        System.out.println(row);
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar un hospital");
+        } else {
+            int id = Integer.parseInt((String) tbl_hospital.getValueAt(row, 0).toString());
+            String name = (String) tbl_hospital.getValueAt(row, 1);
+            String address = (String) tbl_hospital.getValueAt(row, 2);
+            System.out.println(id + " - " + name + " - " + address);
+            txt_idHospital.setText("" + id);
+            txt_nombreHospital.setText(name);
+            txt_direccionHospital.setText(address);
+        }
+
+    }//GEN-LAST:event_tbl_hospitalMouseClicked
+
+    private void btn_añadirHospitalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_añadirHospitalActionPerformed
+        // TODO add your handling code here:
+        add_hospital();
+        clear_rows_table();
+        show_hospitals();
+    }//GEN-LAST:event_btn_añadirHospitalActionPerformed
+
+    private void btn_editarHospitalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editarHospitalActionPerformed
+        // TODO add your handling code here:
+        edit_hospital();
+        clear_rows_table();
+        show_hospitals();
+    }//GEN-LAST:event_btn_editarHospitalActionPerformed
+
+    private void btn_añadirClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_añadirClienteActionPerformed
+        // TODO add your handling code here:
+        new DialogClients(this, true).setVisible(true);
+    }//GEN-LAST:event_btn_añadirClienteActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        // TODO add your handling code here:
+        new DialogPets(this, true).setVisible(true);
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        // TODO add your handling code here:
+        new DialogDoctors(this, true).setVisible(true);
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(FrameHospital.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(FrameHospital.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(FrameHospital.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FrameHospital.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new FrameHospital().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton btn_añadirCliente;
+    private javax.swing.JToggleButton btn_añadirHospital;
+    private javax.swing.JToggleButton btn_editarHospital;
+    private javax.swing.JToggleButton btn_eliminarHospital;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToggleButton jToggleButton1;
+    private javax.swing.JToggleButton jToggleButton2;
+    private javax.swing.JTable tbl_hospital;
+    private javax.swing.JTextField txt_direccionHospital;
+    private javax.swing.JTextField txt_idHospital;
+    public javax.swing.JTextField txt_nombreHospital;
+    // End of variables declaration//GEN-END:variables
+}
